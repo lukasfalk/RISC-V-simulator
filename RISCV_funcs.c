@@ -168,20 +168,75 @@ void execute(struct instruction *instPtr, struct arch *CPUptr){
             break;
         }
 
-        //Loading instructions
+       //Loading instructions
         case 0b0000011:{
 
             int offset = (instPtr->funct7 << 5) | instPtr->rs2;
+            int byteIndex = offset & 0b11;
+            int halfWordIndex = offset & 0b1;
 
             switch(instPtr->funct3){
 
                 //LB
                 case 0b000:{
-                    int byte = CPUptr->mem[0];
-
-
+                    instPtr->rd = CPUptr->mem[offset + instPtr->rs1] & (0b11111111 << ( 8 * byteIndex));
+                    instPtr->rd >>= (8 * byteIndex);
+                    break;
                 }
 
+                //LH
+                case 0b001:{
+                    instPtr->rd = CPUptr->mem[offset + instPtr->rs1] & (0b1111111111111111 << (16 * halfWordIndex));
+                    instPtr->rd >>= ( 16 * halfWordIndex);
+                    break;
+                }
+
+                //LW
+                case 0b010:{
+                    instPtr->rd = CPUptr->mem[offset + instPtr->rs1];
+                    break;
+                }
+
+                //LBU
+                case 0b100:{
+                    instPtr->rd = (unsigned) CPUptr->mem[offset + instPtr->rs1] & (0b11111111 << (8 * byteIndex));
+                    instPtr->rd >>= ( 8 * byteIndex);
+                    break;
+                }
+
+                //LHU
+                case 0b101:{
+                    instPtr->rd = (unsigned) CPUptr->mem[offset + instPtr->rs1] & (0b1111111111111111 << ( 16 * halfWordIndex));
+                    instPtr->rd >>= (16 * halfWordIndex);
+                    break;
+                }
+            }
+            break;
+        }
+
+        //Storing instructions
+        case 0b0100011:{
+
+            int offset = (instPtr->funct7 << 5) | instPtr->rd;
+            int byteIndex = offset & 0b11;
+            int halfWordIndex = offset & 0b1;
+
+            switch(instPtr->funct3){
+
+                //SB
+                case 0b000:{
+                    CPUptr->mem[offset + instPtr->rs1] = instPtr->rs2 & (0b11111111 << ( 8 * byteIndex));break;
+                }
+
+                //SH
+                case 0b001:{
+                    CPUptr->mem[offset + instPtr->rs1] = instPtr->rs2 & (0b11111111 << ( 16 * byteIndex));break;
+                }
+
+                //SW
+                case 0b010:{
+                    CPUptr->mem[offset + instPtr->rs1] = instPtr->rs2;break;
+                }
             }
             break;
         }
