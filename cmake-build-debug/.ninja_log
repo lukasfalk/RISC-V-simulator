@@ -1,0 +1,4 @@
+# ninja log v5
+0	108	6908282605104777	CMakeFiles/RISC-V-simulator.dir/main.c.obj	7c3f4d7fa9b7ad22
+4	109	6908282605124779	CMakeFiles/RISC-V-simulator.dir/functions.c.obj	b7ac091e2b8b2f6e
+110	231	6908282606305046	RISC-V-simulator.exe	62f8ed88195db781
