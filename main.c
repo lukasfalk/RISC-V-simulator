@@ -4,7 +4,7 @@
 #include "functions.h"
 
 struct program{
-    int prog1, prog2, prog3;
+    int prog1, prog2, prog3, prog4, prog5;
 };
 
 int main() {
@@ -12,9 +12,11 @@ int main() {
     //Initialization
 
     struct program prog;
-    prog.prog1 = 0x00500093;  // li x1, 5
-    prog.prog2 = 0x01300113;  // li x2, 19
+    prog.prog1 = 0x00700093;  // li x1, 5
+    prog.prog2 = 0x02b00113;  // li x2, 19
     prog.prog3 = 0x001101b3;  // add x3, x2, x1
+    prog.prog4 = 0x40208533;  // sub a0, x1, x2
+    prog.prog5 = 0x0020d713;  // srli x14, x1, 2
 
 
     // Initializing the sim
@@ -32,6 +34,8 @@ int main() {
         CPU.reg[i] = 0;
     }
 
+    CPU.PC = 0;
+
 
     // Writing binary instruction file
 
@@ -41,8 +45,8 @@ int main() {
     fclose(fptr);
     fptr = fopen("RISCV test program.bin", "rb");
 
+            // Read the entire program and store individual instructions in the memory
     int t = 0;
-
     do{
         fseek(fptr, t * sizeof(int), SEEK_SET);
         fread(&CPU.mem[t], sizeof(int), 1, fptr);
@@ -54,26 +58,17 @@ int main() {
     // Running the sim
 
     int run = 1;
-    int buffer = 0;
-    int n = 0;
 
     while(run == 1) {
 
-        fseek(fptr, n * sizeof(int), SEEK_SET);
-
-        fread(&buffer, sizeof(int), 1, fptr);
-
-        if(buffer == 0b0){
-            run = 0;
-        }
-
-        decode(instPtr, buffer);
+        decode(instPtr, CPU.mem[CPU.PC]);
 
         execute(instPtr, CPUptr);
 
-        n++;
+        CPU.PC++;
 
-        (n >= 4) ? (run = 0) : (run = 1);
+        (CPU.PC >= 10) ? (run = 0) : (run = 1);
+
     }
 
     //Dumping register contents
@@ -81,7 +76,7 @@ int main() {
 
         if (i % 4 == 0 && i != 0){printf("\n");}
 
-        printf("%s%d%s%d%s", "x", i, ": ", CPU.reg[i], "           ");
+        printf("%s%02d%s%-8d", "x", i, ": ", CPU.reg[i]);
     }
 
     return 0;
