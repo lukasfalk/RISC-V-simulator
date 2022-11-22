@@ -3,47 +3,63 @@
 #include <malloc.h>
 #include "functions.h"
 
+struct program{
+    int prog1, prog2, prog3;
+};
+
 int main() {
 
     //Initialization
 
-    //          f7      rs2  rs1 f3  rd  opcode
-    //          !-----!!---!!---!!-!!---!!-----!   Hard-coding instruction
-    int bin = 0b00000000111100000000000110010011;
+    struct program prog;
+    prog.prog1 = 0x00500093;  // li x1, 5
+    prog.prog2 = 0x01300113;  // li x2, 19
+    prog.prog3 = 0x001101b3;  // add x3, x2, x1
 
 
     // Initializing the sim
-    struct arch *CPUptr, CPU;
-    CPUptr = &CPU;
 
+    struct arch *CPUptr, CPU;
     struct instruction *instPtr, inst;
+
+    CPUptr = &CPU;
     instPtr = &inst;
 
-    static int x0 = 0;
-
+    static int x0 = 0; // x0 is always 0
     CPU.reg[0] = x0;
 
     for (int i = 1; i < 32; i++){
         CPU.reg[i] = 0;
     }
 
-    FILE *fptr;
 
     // Writing binary instruction file
-    fptr = fopen("RISCV instruction test.bin", "wb");
-    fwrite(&bin, 4, 1, fptr);
-    fclose(fptr);
 
-    fptr = fopen("RISCV instruction test.bin", "rb");
+    FILE *fptr;
+    fptr = fopen("RISCV test program.bin", "wb");
+    fwrite(&prog, sizeof(struct program), 1, fptr);
+    fclose(fptr);
+    fptr = fopen("RISCV test program.bin", "rb");
+
+    int t = 0;
+
+    do{
+        fseek(fptr, t * sizeof(int), SEEK_SET);
+        fread(&CPU.mem[t], sizeof(int), 1, fptr);
+        t++;
+    }while(CPU.mem[t - 1] != 0);
+
+
 
     // Running the sim
-    int run = 1;
 
-    int buffer;
+    int run = 1;
+    int buffer = 0;
+    int n = 0;
 
     while(run == 1) {
 
-        //fseek(fptr, CPU.PC * 4, SEEK_SET);
+        fseek(fptr, n * sizeof(int), SEEK_SET);
 
         fread(&buffer, sizeof(int), 1, fptr);
 
@@ -55,7 +71,9 @@ int main() {
 
         execute(instPtr, CPUptr);
 
-        run = 0;
+        n++;
+
+        (n >= 4) ? (run = 0) : (run = 1);
     }
 
     //Dumping register contents
@@ -65,5 +83,6 @@ int main() {
 
         printf("%s%d%s%d%s", "x", i, ": ", CPU.reg[i], "           ");
     }
+
     return 0;
 }
