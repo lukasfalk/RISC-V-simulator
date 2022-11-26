@@ -24,17 +24,15 @@ void decode(struct instruction *instPtr, int a){
 
 void execute(struct instruction *instPtr, struct arch *CPUptr){
 
-    //Remember to load every instruction opcode into CPU memory
-
-
-
     switch(instPtr->opcode) { // General instruction
+
 
         // LUI - Load Upper Imm
         case 0b0110111:{
             uint32_t imm = ( instPtr->funct7 << 13 ) | ( instPtr->rs2 << 8 ) | ( instPtr->rs1 << 3 ) | instPtr->funct3 ;
 
-            instPtr->rd = imm << 12 ;
+            CPUptr->reg[instPtr->rd] = (int32_t)imm << 12 ;
+            break;
         }
 
         // AUIPC - Add upper immediate to PC
@@ -42,18 +40,19 @@ void execute(struct instruction *instPtr, struct arch *CPUptr){
             uint32_t imm = ( instPtr->funct7 << 13 ) | ( instPtr->rs2 << 8 ) | ( instPtr->rs1 << 3 ) | instPtr->funct3 ;
 
             instPtr->rd = CPUptr->PC + ( imm << 12 );
+            break;
         }
         
         // I-type instructions
         case 0b0010011:{
 
-            uint32_t imm = (instPtr->funct7 << 5) | instPtr->rs2;
+            uint32_t imm = ( instPtr->funct7 << 5 | instPtr->rs2 );
 
             switch(instPtr->funct3){
 
                 // ADDI
                 case 0b000:{
-                    CPUptr->reg[instPtr->rd] = CPUptr->reg[instPtr->rs1] + imm;
+                    CPUptr->reg[instPtr->rd] = CPUptr->reg[instPtr->rs1] + (int32_t) imm;
                     break;
                 }
 

@@ -41,10 +41,16 @@ int main() {
     // Writing binary instruction file
 
     FILE *fptr;
+    /*
     fptr = fopen("RISCV test program.bin", "wb");
     fwrite(&prog, sizeof(struct program), 1, fptr);
     fclose(fptr);
-    fptr = fopen("RISCV test program.bin", "rb");
+     */
+
+    //Select program
+
+    //fptr = fopen("RISCV test program.bin", "rb");
+    fptr = fopen("C:\\Users\\matth\\Documents\\GitHub\\RISC-V-simulator\\Tests\\task1\\addlarge.bin", "rb");
 
             // Read the entire program and store individual instructions in the memory
     int t = 0;
