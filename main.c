@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include "functions.h"
+#include "stdint.h"
 
 struct program{
-    int prog1, prog2, prog3, prog4, prog5;
+    uint32_t prog1, prog2, prog3, prog4, prog5;
 };
 
 int main() {
@@ -12,8 +13,8 @@ int main() {
     //Initialization
 
     struct program prog;
-    prog.prog1 = 0x00700093;  // li x1, 5
-    prog.prog2 = 0x02b00113;  // li x2, 19
+    prog.prog1 = 0x00500093;  // li x1, 5
+    prog.prog2 = 0x01300113;  // li x2, 19
     prog.prog3 = 0x001101b3;  // add x3, x2, x1
     prog.prog4 = 0x40208533;  // sub a0, x1, x2
     prog.prog5 = 0x0020d713;  // srli x14, x1, 2
@@ -48,10 +49,10 @@ int main() {
             // Read the entire program and store individual instructions in the memory
     int t = 0;
     do{
-        fseek(fptr, t * sizeof(int), SEEK_SET);
-        fread(&CPU.mem[t], sizeof(int), 1, fptr);
+        fseek(fptr, t * sizeof(uint32_t), SEEK_SET);
+        fread(&CPU.instrMem[t], sizeof(uint32_t), 1, fptr);
         t++;
-    }while(CPU.mem[t - 1] != 0);
+    }while(CPU.instrMem[t - 1] != 0);
 
 
 
@@ -61,7 +62,7 @@ int main() {
 
     while(run == 1) {
 
-        decode(instPtr, CPU.mem[CPU.PC]);
+        decode(instPtr, CPU.instrMem[CPU.PC]);
 
         execute(instPtr, CPUptr);
 
@@ -76,7 +77,7 @@ int main() {
 
         if (i % 4 == 0 && i != 0){printf("\n");}
 
-        printf("%s%02d%s%-8d", "x", i, ": ", CPU.reg[i]);
+        printf("%s%02d%s%-12d", "x", i, ": ", CPU.reg[i]);
     }
 
     return 0;

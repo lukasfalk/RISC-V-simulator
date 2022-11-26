@@ -1,20 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include "stdint.h"
+
+#define RAM 2^20
 
 struct arch{
 
-    int PC;
+    uint32_t PC;
 
-    int reg[32];
+    uint32_t reg[32];
 
-    int mem[512];
+    uint32_t instrMem[256];
+
+    uint8_t mem[RAM];
 
 };
 
 struct instruction{
 
-    int funct7, rs2, rs1, funct3, rd, opcode;
+    uint32_t funct7, rs2, rs1, funct3, rd, opcode;
 
 };
 
