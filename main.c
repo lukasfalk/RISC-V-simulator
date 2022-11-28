@@ -74,12 +74,10 @@ int main() {
 
         CPU.PC++;
 
-        (CPU.PC >= 10) ? (run = 0) : (run = 1);
-
     }
 
     //Dumping register contents
-    for (int i = 0; i < 32; i++){
+    for (int i = 0; i < 32; i++) {
 
         if (i % 4 == 0 && i != 0){printf("\n");}
 

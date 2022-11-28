@@ -338,6 +338,17 @@ void execute(struct instruction *instPtr, struct arch *CPUptr){
 
             CPUptr->PC = instPtr->rs1 + imm;
 
+            if (CPUptr->ra != 0) {
+                for (int i = 0; i < 64; i++) {
+                    if (CPUptr->stackr[i] == 0) {
+                        CPUptr->sp = i;
+                        break;
+                    }
+                }
+                CPUptr->stackr[CPUptr->sp] = CPUptr->ra;
+            }
+            CPUptr->ra = CPUptr->PC;
+
             break;
         }
 

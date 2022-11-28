@@ -7,9 +7,15 @@
 
 struct arch{
 
-    uint32_t PC;
+    uint32_t PC = 0;
 
-    uint32_t reg[32];
+    uint32_t reg[30];
+
+    int32_t ra = 0;
+
+    int32_t sp = 0;
+
+    int32_t stackr[64] = { 0 };
 
     uint32_t instrMem[256];
 
